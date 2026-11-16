@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="pos_second_receipt_view_form" model="ir.ui.view">
+        <field name="name">pos.second.receipt.view.form</field>
+        <field name="model">pos.second.receipt</field>
+        <field name="arch" type="xml">
+            <form string="Second Receipt Design">
+                <header>
+                    <button name="action_validate_xml"
+                            string="Validate XML Syntax"
+                            type="object"
+                            class="btn-secondary"/>
+                </header>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="design_receipt" widget="code" options="{'mode': 'xml'}"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="pos_second_receipt_view_list" model="ir.ui.view">
+        <field name="name">pos.second.receipt.view.list</field>
+        <field name="model">pos.second.receipt</field>
+        <field name="arch" type="xml">
+            <list string="Second Receipt Designs">
+                <field name="name"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="pos_second_receipt_action" model="ir.actions.act_window">
+        <field name="name">Second Receipt Designs</field>
+        <field name="res_model">pos.second.receipt</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="pos_second_receipt_menu"
+              name="Second Receipt Designs"
+              parent="point_of_sale.menu_point_config_product"
+              action="pos_second_receipt_action"
+              sequence="55"/>
+</odoo>

@@ -1,0 +1,3 @@
+id,name,model_id,group_id/id,operation,domain
+access_pos_second_receipt_user,pos.second.receipt.user,pos.second.receipt,point_of_sale.group_pos_user,r,
+access_pos_second_receipt_manager,pos.second.receipt.manager,pos.second.receipt,point_of_sale.group_pos_manager,crud,

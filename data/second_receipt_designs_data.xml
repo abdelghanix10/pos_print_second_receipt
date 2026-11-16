@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Design 1: Simplified Summary Receipt with Total & Payments -->
+        <record id="second_receipt_design_summary" model="pos.second.receipt">
+            <field name="name">Design 1: Simplified Summary Receipt</field>
+            <field name="design_receipt"><![CDATA[
+<div class="pos-receipt" style="font-family: 'Courier New', monospace; padding: 6px; border: 1px solid #000;">
+    <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 6px;">
+        <div style="font-size: 16px; font-weight: bold;">
+            <t t-out="this.props.data.title || 'ORDER COPY'"/>
+        </div>
+        <div t-if="this.props.data.company_name" style="font-size: 12px;">
+            <t t-out="this.props.data.company_name"/>
+        </div>
+    </div>
+
+    <div style="font-size: 13px; margin-bottom: 6px; border-bottom: 1px dashed #000; padding-bottom: 6px;">
+        <div style="display: flex; justify-content: space-between;">
+            <span>Order:</span>
+            <strong><t t-out="this.props.data.name"/></strong>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+            <span>Date:</span>
+            <span><t t-out="this.props.data.date"/></span>
+        </div>
+        <div t-if="this.props.data.cashier" style="display: flex; justify-content: space-between;">
+            <span>Cashier:</span>
+            <span><t t-out="this.props.data.cashier"/></span>
+        </div>
+        <div t-if="this.props.data.customer" style="display: flex; justify-content: space-between;">
+            <span>Customer:</span>
+            <strong><t t-out="this.props.data.customer"/></strong>
+        </div>
+    </div>
+
+    <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
+        <thead>
+            <tr style="border-bottom: 1px solid #000;">
+                <th style="text-align: left; width: 55%;">Item</th>
+                <th style="text-align: center; width: 15%;">Qty</th>
+                <th style="text-align: right; width: 30%;">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            <t t-foreach="this.props.data.orderlines" t-as="line" t-key="line.id">
+                <tr style="border-bottom: 1px dotted #ccc;">
+                    <td style="padding: 3px 0; font-weight: bold;">
+                        <t t-out="line.product_name"/>
+                        <div t-if="line.customer_note" style="font-size: 11px; font-style: italic;">
+                            Note: <t t-out="line.customer_note"/>
+                        </div>
+                    </td>
+                    <td style="text-align: center;"><t t-out="line.qty"/></td>
+                    <td style="text-align: right;"><t t-out="this.props.formatCurrency(line.line_total)"/></td>
+                </tr>
+            </t>
+        </tbody>
+    </table>
+
+    <div style="border-top: 2px solid #000; margin-top: 8px; padding-top: 6px; font-size: 14px; font-weight: bold; display: flex; justify-content: space-between;">
+        <span>TOTAL:</span>
+        <span><t t-out="this.props.formatCurrency(this.props.data.amount_total)"/></span>
+    </div>
+
+    <div t-if="this.props.data.footer_text" style="text-align: center; font-size: 12px; margin-top: 10px; border-top: 1px dashed #000; padding-top: 6px;">
+        <t t-out="this.props.data.footer_text"/>
+    </div>
+</div>
+            ]]></field>
+        </record>
+
+        <!-- Design 2: Kitchen / Preparation Ticket (No Prices) -->
+        <record id="second_receipt_design_kitchen" model="pos.second.receipt">
+            <field name="name">Design 2: Kitchen / Preparation Ticket (No Prices)</field>
+            <field name="design_receipt"><![CDATA[
+<div class="pos-receipt" style="font-family: 'Courier New', monospace; padding: 6px; border: 2px solid #000;">
+    <div style="text-align: center; background: #000; color: #fff; padding: 6px; margin-bottom: 8px;">
+        <div style="font-size: 18px; font-weight: bold;">KITCHEN / PREP SLIP</div>
+        <div style="font-size: 16px;"><t t-out="this.props.data.name"/></div>
+    </div>
+
+    <div style="font-size: 13px; margin-bottom: 8px; border-bottom: 1px dashed #000; padding-bottom: 6px;">
+        <div><strong>Time:</strong> <t t-out="this.props.data.date"/></div>
+        <div t-if="this.props.data.cashier"><strong>Server:</strong> <t t-out="this.props.data.cashier"/></div>
+        <div t-if="this.props.data.customer"><strong>Customer:</strong> <t t-out="this.props.data.customer"/></div>
+    </div>
+
+    <table style="width: 100%; font-size: 15px; border-collapse: collapse;">
+        <thead>
+            <tr style="border-bottom: 2px solid #000;">
+                <th style="text-align: left; width: 25%;">QTY</th>
+                <th style="text-align: left; width: 75%;">ITEM</th>
+            </tr>
+        </thead>
+        <tbody>
+            <t t-foreach="this.props.data.orderlines" t-as="line" t-key="line.id">
+                <tr style="border-bottom: 1px dashed #000;">
+                    <td style="padding: 6px 0; font-size: 17px; font-weight: bold;">
+                        <t t-out="line.qty"/>x
+                    </td>
+                    <td style="padding: 6px 0; font-weight: bold;">
+                        <t t-out="line.product_name"/>
+                        <div t-if="line.customer_note" style="font-size: 13px; margin-top: 2px; text-decoration: underline;">
+                            ** <t t-out="line.customer_note"/> **
+                        </div>
+                    </td>
+                </tr>
+            </t>
+        </tbody>
+    </table>
+
+    <div style="margin-top: 8px; text-align: center; font-size: 13px; font-weight: bold;">
+        Total Items: <t t-out="this.props.data.total_qty"/>
+    </div>
+</div>
+            ]]></field>
+        </record>
+
+        <!-- Design 3: Customer Pickup Token -->
+        <record id="second_receipt_design_token" model="pos.second.receipt">
+            <field name="name">Design 3: Customer Pickup Token</field>
+            <field name="design_receipt"><![CDATA[
+<div class="pos-receipt" style="font-family: 'Courier New', monospace; padding: 8px; text-align: center; border: 1px solid #000;">
+    <div style="font-size: 13px; text-transform: uppercase;">Pickup Token</div>
+    <div style="font-size: 26px; font-weight: bold; margin: 6px 0; padding: 6px; border: 2px dashed #000;">
+        <t t-out="this.props.data.short_number || this.props.data.name"/>
+    </div>
+    <div style="font-size: 12px; margin-bottom: 8px;"><t t-out="this.props.data.date"/></div>
+
+    <div style="text-align: left; border-top: 1px solid #000; padding-top: 6px; font-size: 13px;">
+        <t t-foreach="this.props.data.orderlines" t-as="line" t-key="line.id">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+                <span><t t-out="line.qty"/>x <t t-out="line.product_name"/></span>
+                <span><t t-out="this.props.formatCurrency(line.line_total)"/></span>
+            </div>
+        </t>
+    </div>
+
+    <div style="border-top: 2px solid #000; margin-top: 6px; padding-top: 6px; font-weight: bold; font-size: 15px; display: flex; justify-content: space-between;">
+        <span>PAID:</span>
+        <span><t t-out="this.props.formatCurrency(this.props.data.amount_total)"/></span>
+    </div>
+</div>
+            ]]></field>
+        </record>
+    </data>
+</odoo>

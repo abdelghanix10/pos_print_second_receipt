@@ -1,42 +1,90 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <templates id="template" xml:space="preserve">
-    <t t-name="pos_print_second_receipt.SecondReceipt" owl="1">
-        <div class="pos-receipt" style="font-family: 'Inconsolata', monospace; padding: 5px; border: 1px solid #000;">
-            <!-- Info -->
-            <div class="pos-receipt-contact" style="font-size: 14px; margin-bottom: 5px; border-bottom: 1px dashed #000; padding-bottom: 5px;">
-                <div style="display: flex; justify-content: space-between;">
-                    <span>Date:</span>
-                    <span style="font-weight: bold;"><t t-esc="props.data.date" /></span>
-                </div>
-                <div style="display: flex; justify-content: space-between;">
-                    <span>Order No:</span>
-                    <span style="font-weight: bold;"><t t-esc="props.data.name" /></span>
-                </div>
-            </div>
+    <t t-name="pos_print_second_receipt.SecondReceipt">
+        <!-- If a custom XML design is enabled and selected, render it -->
+        <t t-if="this.customTemplateComponent">
+            <t t-component="this.customTemplateComponent"
+               data="this.props.data"
+               receipt="this.props.receipt"
+               orderlines="this.props.orderlines"
+               config="this.props.config"
+               formatCurrency="this.props.formatCurrency"/>
+        </t>
 
-            <!-- Items Header -->
-            <div style="display: flex; font-weight: bold; border-bottom: 1px solid #000; padding-bottom: 5px; margin-bottom: 5px; font-size: 13px;">
-                <span style="flex: 2;">Item</span>
-                <span style="flex: 1; text-align: center;">Qty</span>
-                <span style="flex: 1; text-align: right;">Price</span>
-            </div>
+        <!-- Otherwise render the configurable built-in second receipt -->
+        <t t-else="">
+            <div class="pos-receipt" style="font-family: 'Inconsolata', 'Courier New', monospace; padding: 6px; border: 1px solid #000;">
+                <!-- Header Title -->
+                <div t-if="this.props.data.title"
+                     style="text-align: center; font-size: 16px; font-weight: bold; border-bottom: 2px solid #000; padding-bottom: 4px; margin-bottom: 6px;">
+                    <t t-out="this.props.data.title"/>
+                </div>
 
-            <!-- Items List -->
-            <div class="pos-receipt-order-data" style="font-size: 13px;">
-                <t t-foreach="props.data.orderlines" t-as="line" t-key="line.id">
-                    <div style="display: flex; margin-bottom: 5px; border-bottom: 1px dotted #ccc; padding-bottom: 2px;">
-                        <div style="flex: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; padding-right: 5px;">
-                            <t t-esc="line.product_name || 'Unknown Product'" />
-                        </div>
-                        <div style="flex: 1; text-align: center;">
-                            <t t-esc="line.qty || 0" />
-                        </div>
-                        <div style="flex: 1; text-align: right;">
-                            <t t-esc="props.formatCurrency((line.price || 0) * (line.qty || 0))" />
-                        </div>
+                <!-- Order Metadata -->
+                <div class="pos-receipt-contact" style="font-size: 13px; margin-bottom: 6px; border-bottom: 1px dashed #000; padding-bottom: 5px;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Date:</span>
+                        <span style="font-weight: bold;"><t t-out="this.props.data.date"/></span>
                     </div>
-                </t>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Order No:</span>
+                        <span style="font-weight: bold;"><t t-out="this.props.data.name"/></span>
+                    </div>
+                    <t t-if="this.props.data.show_cashier">
+                        <div t-if="this.props.data.cashier" style="display: flex; justify-content: space-between;">
+                            <span>Cashier:</span>
+                            <span><t t-out="this.props.data.cashier"/></span>
+                        </div>
+                        <div t-if="this.props.data.customer" style="display: flex; justify-content: space-between;">
+                            <span>Customer:</span>
+                            <span style="font-weight: bold;"><t t-out="this.props.data.customer"/></span>
+                        </div>
+                    </t>
+                </div>
+
+                <!-- Items Header -->
+                <div style="display: flex; font-weight: bold; border-bottom: 1px solid #000; padding-bottom: 4px; margin-bottom: 5px; font-size: 13px;">
+                    <span style="flex: 2;">Item</span>
+                    <span style="flex: 1; text-align: center;">Qty</span>
+                    <span t-if="this.props.data.show_prices" style="flex: 1; text-align: right;">Amount</span>
+                </div>
+
+                <!-- Items List -->
+                <div class="pos-receipt-order-data" style="font-size: 13px;">
+                    <t t-foreach="this.props.data.orderlines" t-as="line" t-key="line.id">
+                        <div style="margin-bottom: 5px; border-bottom: 1px dotted #ccc; padding-bottom: 3px;">
+                            <div style="display: flex;">
+                                <div style="flex: 2; font-weight: bold; padding-right: 5px; word-break: break-word;">
+                                    <t t-out="line.product_name || 'Unknown Product'"/>
+                                </div>
+                                <div style="flex: 1; text-align: center; font-weight: bold;">
+                                    <t t-out="line.qty || 0"/>
+                                </div>
+                                <div t-if="this.props.data.show_prices" style="flex: 1; text-align: right;">
+                                    <t t-out="this.props.formatCurrency(line.line_total || 0)"/>
+                                </div>
+                            </div>
+                            <div t-if="this.props.data.show_notes and line.customer_note"
+                                 style="font-size: 11px; font-style: italic; margin-top: 2px;">
+                                Note: <t t-out="line.customer_note"/>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+
+                <!-- Total Row -->
+                <div t-if="this.props.data.show_prices"
+                     style="display: flex; justify-content: space-between; font-weight: bold; font-size: 14px; border-top: 2px solid #000; margin-top: 6px; padding-top: 5px;">
+                    <span>TOTAL:</span>
+                    <span><t t-out="this.props.formatCurrency(this.props.data.amount_total || 0)"/></span>
+                </div>
+
+                <!-- Optional Footer -->
+                <div t-if="this.props.data.footer_text"
+                     style="text-align: center; font-size: 12px; margin-top: 8px; border-top: 1px dashed #000; padding-top: 5px;">
+                    <t t-out="this.props.data.footer_text"/>
+                </div>
             </div>
-        </div>
+        </t>
     </t>
 </templates>
